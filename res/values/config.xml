@@ -99,7 +99,7 @@
     <bool name="voicemail_notification_enabled">true</bool>
 
     <!-- Flag indicating if the tty is enabled -->
-    <bool name="tty_enabled">false</bool>
+    <bool name="tty_enabled">true</bool>
 
     <!-- Flag indicating if hac is enabled -->
     <bool name="hac_enabled">false</bool>
