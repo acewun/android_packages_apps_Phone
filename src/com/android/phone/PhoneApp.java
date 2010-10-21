@@ -109,7 +109,8 @@ public class PhoneApp extends Application implements AccelerometerListener.Orien
     private static final int EVENT_TTY_PREFERRED_MODE_CHANGED = 14;
     private static final int EVENT_TTY_MODE_GET = 15;
     private static final int EVENT_TTY_MODE_SET = 16;
-    private static final int EVENT_START_SIP_SERVICE = 17;
+    private static final int EVENT_TECHNOLOGY_CHANGED = 17;
+
 
     // The MMI codes are also used by the InCallScreen.
     public static final int MMI_INITIATE = 51;
@@ -229,6 +230,7 @@ public class PhoneApp extends Application implements AccelerometerListener.Orien
     private boolean mTtyEnabled;
     // Current TTY operating mode selected by user
     private int mPreferredTtyMode = Phone.TTY_MODE_OFF;
+    private int mPhoneType;
 
     // add by cytown
     private static final String ACTION_VIBRATE_45 = "com.android.phone.PhoneApp.ACTION_VIBRATE_45";
@@ -284,10 +286,19 @@ public class PhoneApp extends Application implements AccelerometerListener.Orien
         return mShouldRestoreMuteOnInCallResume;
     }
 
+    /*package*/void checkPhoneType() {
+        if (mPhoneType != phone.getPhoneType()) {
+            Log.d(LOG_TAG,"handleMessage: radio Technology has changed (" + phone.getPhoneName() + ")");
+            initForNewRadioTechnology();
+            mPhoneType = phone.getPhoneType();
+        }
+    }
+
     Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             Phone.State phoneState;
+            checkPhoneType();
             switch (msg.what) {
                 // Starts the SIP service. It's a no-op if SIP API is not supported
                 // on the deivce.
@@ -434,6 +445,10 @@ public class PhoneApp extends Application implements AccelerometerListener.Orien
                 case EVENT_TTY_MODE_SET:
                     handleSetTTYModeResponse(msg);
                     break;
+
+                case EVENT_TECHNOLOGY_CHANGED:
+                    // Nothing to do here. already handled by checkPhoneType above
+                    break;
             }
         }
     };
@@ -459,6 +474,7 @@ public class PhoneApp extends Application implements AccelerometerListener.Orien
             mCM.registerPhone(phone);
 
 
+            mPhoneType = phone.getPhoneType();
             NotificationMgr.init(this);
 
             phoneMgr = new PhoneInterfaceManager(this, phone);
@@ -1529,7 +1545,7 @@ public class PhoneApp extends Application implements AccelerometerListener.Orien
             } else if (action.equals(TelephonyIntents.ACTION_RADIO_TECHNOLOGY_CHANGED)) {
                 String newPhone = intent.getStringExtra(Phone.PHONE_NAME_KEY);
                 Log.d(LOG_TAG, "Radio technology switched. Now " + newPhone + " is active.");
-                initForNewRadioTechnology();
+                mHandler.sendEmptyMessage(EVENT_TECHNOLOGY_CHANGED);
             } else if (action.equals(TelephonyIntents.ACTION_SERVICE_STATE_CHANGED)) {
                 handleServiceStateChanged(intent);
             } else if (action.equals(TelephonyIntents.ACTION_EMERGENCY_CALLBACK_MODE_CHANGED)) {
