@@ -323,6 +323,18 @@ public class Settings extends PreferenceActivity implements DialogInterface.OnCl
                     case Phone.NT_MODE_WCDMA_PREF:
                         modemNetworkMode = Phone.NT_MODE_WCDMA_PREF;
                         break;
+                    case Phone.NT_MODE_CDMA_AND_LTE_EVDO:
+                        modemNetworkMode = Phone.NT_MODE_CDMA_AND_LTE_EVDO;
+                        break;
+                    case Phone.NT_MODE_GSM_WCDMA_LTE:
+                        modemNetworkMode = Phone.NT_MODE_GSM_WCDMA_LTE;
+                        break;
+                    case Phone.NT_MODE_GLOBAL_LTE:
+                        modemNetworkMode = Phone.NT_MODE_GLOBAL_LTE;
+                        break;
+                    case Phone.NT_MODE_LTE_ONLY:
+                        modemNetworkMode = Phone.NT_MODE_LTE_ONLY;
+                        break;
                     default:
                         modemNetworkMode = Phone.PREFERRED_NT_MODE;
                 }
@@ -395,7 +407,11 @@ public class Settings extends PreferenceActivity implements DialogInterface.OnCl
                         modemNetworkMode == Phone.NT_MODE_CDMA ||
                         modemNetworkMode == Phone.NT_MODE_CDMA_NO_EVDO ||
                         modemNetworkMode == Phone.NT_MODE_EVDO_NO_CDMA ||
-                        modemNetworkMode == Phone.NT_MODE_GLOBAL ) {
+                        modemNetworkMode == Phone.NT_MODE_GLOBAL ||
+                        modemNetworkMode == Phone.NT_MODE_CDMA_AND_LTE_EVDO ||
+                        modemNetworkMode == Phone.NT_MODE_GSM_WCDMA_LTE ||
+                        modemNetworkMode == Phone.NT_MODE_GLOBAL_LTE ||
+                        modemNetworkMode == Phone.NT_MODE_LTE_ONLY) {
                     if (DBG) {
                         log("handleGetPreferredNetworkTypeResponse: if 1: modemNetworkMode = " +
                                 modemNetworkMode);
@@ -471,6 +487,8 @@ public class Settings extends PreferenceActivity implements DialogInterface.OnCl
     }
 
     private void UpdatePreferredNetworkModeSummary(int NetworkMode) {
+        String summaryDisplay = "";
+
         switch(NetworkMode) {
             case Phone.NT_MODE_WCDMA_PREF:
                 // TODO T: Make all of these strings come from res/values/strings.xml.
@@ -494,9 +512,27 @@ public class Settings extends PreferenceActivity implements DialogInterface.OnCl
             case Phone.NT_MODE_EVDO_NO_CDMA:
                 mButtonPreferredNetworkMode.setSummary("Preferred network mode: EvDo only");
                 break;
+            case Phone.NT_MODE_CDMA_AND_LTE_EVDO:
+                summaryDisplay = "Preferred network mode:  CDMA + LTE / EvDo";
+                mButtonPreferredNetworkMode.setSummary(summaryDisplay);
+                break;
+            case Phone.NT_MODE_GSM_WCDMA_LTE:
+                summaryDisplay = "Preferred network mode:  GSM / WCDMA / LTE";
+                mButtonPreferredNetworkMode.setSummary(summaryDisplay);
+                break;
+            case Phone.NT_MODE_LTE_ONLY:
+                summaryDisplay = "Preferred network mode:  LTE only";
+                mButtonPreferredNetworkMode.setSummary(summaryDisplay);
+                break;
             case Phone.NT_MODE_GLOBAL:
-            default:
                 mButtonPreferredNetworkMode.setSummary("Preferred network mode: Global");
+                break;
+            case Phone.NT_MODE_GLOBAL_LTE:
+                mButtonPreferredNetworkMode.setSummary("Preferred network mode: Global + LTE");
+                break;
+            default:
+                // should never come here
+                mButtonPreferredNetworkMode.setSummary("");
         }
     }
 
@@ -522,4 +558,5 @@ public class Settings extends PreferenceActivity implements DialogInterface.OnCl
     private static void log(String msg) {
         Log.d(LOG_TAG, msg);
     }
+
 }
